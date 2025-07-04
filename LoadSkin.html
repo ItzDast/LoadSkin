@@ -4,86 +4,143 @@
   <meta charset="UTF-8" />
   <title>Скин Minecraft по нику</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin-top: 40px; }
-    input { padding: 10px; font-size: 16px; width: 220px; }
-    button { padding: 10px 20px; font-size: 16px; margin-left: 10px; cursor: pointer; }
-    .skin-container { position: relative; display: inline-block; }
-    .layer-base, .layer-overlay {
-      position: absolute; top: 0; left: 0; image-rendering: pixelated;
-      border-radius: 10px; box-shadow: 0 0 10px #ccc;
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 40px;
+      background: #f0f0f0;
+      color: #333;
     }
-    .layer-base { z-index: 1; }
-    .layer-overlay { z-index: 2; }
-    #head-base, #head-overlay { width: 150px; height: 150px; }
-    #body-base, #body-overlay { width: 100px; height: auto; }
-    .error { color: red; margin-top: 20px; }
+    input {
+      padding: 10px;
+      font-size: 16px;
+      width: 220px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-left: 10px;
+      cursor: pointer;
+      border: none;
+      background-color: #4CAF50;
+      color: white;
+      border-radius: 4px;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .skin-container {
+      position: relative;
+      display: inline-block;
+      margin: 15px;
+    }
+    .layer-base, .layer-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      image-rendering: pixelated;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      background: white;
+    }
+    .layer-base {
+      z-index: 1;
+    }
+    .layer-overlay {
+      z-index: 2;
+    }
+    #head-base, #head-overlay {
+      width: 150px;
+      height: 150px;
+    }
+    #body-base, #body-overlay {
+      width: 200px;
+      height: auto;
+    }
+    .error {
+      color: red;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    #result {
+      margin-top: 30px;
+      background: white;
+      padding: 20px;
+      display: inline-block;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    }
   </style>
 </head>
 <body>
 
-<h1>Скин игрока Minecraft</h1>
-<input type="text" id="nickname" placeholder="Введите ник" />
-<button onclick="loadSkin()">Показать скин</button>
+  <h1>Скин игрока Minecraft</h1>
+  <input type="text" id="nickname" placeholder="Введите ник" autocomplete="off" />
+  <button onclick="loadSkin()">Показать скин</button>
 
-<div class="error" id="error" style="display:none;"></div>
+  <div class="error" id="error" style="display:none;"></div>
 
-<div id="result" style="display:none;">
-  <h2>Результат</h2>
-  <p><strong>UUID:</strong> <span id="uuid"></span></p>
+  <div id="result" style="display:none;">
+    <h2>Результат</h2>
+    <p><strong>UUID:</strong> <span id="uuid"></span></p>
 
-  <p>Голова:</p>
-  <div class="skin-container" style="width:150px; height:150px;">
-    <img id="head-base" class="layer-base" src="" alt="Голова базовая" />
-    <img id="head-overlay" class="layer-overlay" src="" alt="Голова наложение" />
+    <p>Голова:</p>
+    <div class="skin-container" style="width:150px; height:150px;">
+      <img id="head-base" class="layer-base" src="" alt="Голова базовая" />
+      <img id="head-overlay" class="layer-overlay" src="" alt="Голова наложение" />
+    </div>
+
+    <p>Тело:</p>
+    <div class="skin-container" style="width:200px; height:auto;">
+      <img id="body-base" class="layer-base" src="" alt="Тело базовое" />
+      <img id="body-overlay" class="layer-overlay" src="" alt="Тело наложение" />
+    </div>
   </div>
 
-  <p>Тело:</p>
-  <div class="skin-container" style="width:100px; height:auto;">
-    <img id="body-base" class="layer-base" src="" alt="Тело базовое" />
-    <img id="body-overlay" class="layer-overlay" src="" alt="Тело наложение" />
-  </div>
-</div>
+  <script>
+    async function loadSkin() {
+      const nickname = document.getElementById("nickname").value.trim();
+      const errorEl = document.getElementById("error");
+      const resultEl = document.getElementById("result");
 
-<script>
-  async function loadSkin() {
-    const nickname = document.getElementById("nickname").value.trim();
-    const errorEl = document.getElementById("error");
-    const resultEl = document.getElementById("result");
+      errorEl.style.display = "none";
+      resultEl.style.display = "none";
 
-    errorEl.style.display = "none";
-    resultEl.style.display = "none";
+      if (!nickname) {
+        errorEl.textContent = "Введите ник.";
+        errorEl.style.display = "block";
+        return;
+      }
 
-    if (!nickname) {
-      errorEl.textContent = "Введите ник.";
-      errorEl.style.display = "block";
-      return;
+      try {
+        const response = await fetch('https://api.minetools.eu/uuid/' + encodeURIComponent(nickname));
+        if (!response.ok) throw new Error('Ник не найден');
+
+        const data = await response.json();
+        if (!data.id) throw new Error('Ник не найден');
+
+        const uuid = data.id.replace(/-/g, '');
+
+        document.getElementById("uuid").textContent = uuid;
+
+        // Голова с двумя слоями
+        document.getElementById("head-base").src = `https://crafatar.com/avatars/${uuid}?size=150&overlay=false`;
+        document.getElementById("head-overlay").src = `https://crafatar.com/avatars/${uuid}?size=150&overlay=true`;
+
+        // Тело с двумя слоями, scale=8 для высокого качества
+        document.getElementById("body-base").src = `https://crafatar.com/renders/body/${uuid}?scale=8&overlay=false`;
+        document.getElementById("body-overlay").src = `https://crafatar.com/renders/body/${uuid}?scale=8&overlay=true`;
+
+        resultEl.style.display = "block";
+      } catch (err) {
+        errorEl.textContent = "Ошибка: " + err.message;
+        errorEl.style.display = "block";
+      }
     }
-
-    try {
-      const proxyUrl = "https://api.allorigins.win/raw?url=";
-      const apiUrl = encodeURIComponent(`http://api.mojang.com/users/profiles/minecraft/${nickname}`);
-      const response = await fetch(proxyUrl + apiUrl);
-
-      if (!response.ok) throw new Error("Ник не найден");
-
-      const data = await response.json();
-      const uuid = data.id;
-
-      document.getElementById("uuid").textContent = uuid;
-
-      document.getElementById("head-base").src = `https://crafatar.com/avatars/${uuid}?size=150&overlay=false`;
-      document.getElementById("head-overlay").src = `https://crafatar.com/avatars/${uuid}?size=150&overlay=true`;
-
-      document.getElementById("body-base").src = `https://crafatar.com/renders/body/${uuid}?scale=4&overlay=false`;
-      document.getElementById("body-overlay").src = `https://crafatar.com/renders/body/${uuid}?scale=4&overlay=true`;
-
-      resultEl.style.display = "block";
-    } catch (err) {
-      errorEl.textContent = "Ошибка: " + err.message;
-      errorEl.style.display = "block";
-    }
-  }
-</script>
+  </script>
 
 </body>
 </html>
