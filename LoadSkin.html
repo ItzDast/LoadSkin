@@ -2,7 +2,8 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8" />
-  <title>Скин Minecraft по никку</title>
+  <title>Скин Minecraft по ниу</title>
+  <link rel="icon" href="https://mcdf.wiki.gg/images/a/ab/PlayerHead.png?ddb13c" type="image/png">
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -16,7 +17,7 @@
       font-size: 16px;
       width: 220px;
       border: 1px solid #ccc;
-      border-radius: 4px;
+      border-radius: 50px;
     }
     button {
       padding: 10px 20px;
@@ -26,7 +27,7 @@
       border: none;
       background-color: #4CAF50;
       color: white;
-      border-radius: 4px;
+      border-radius: 50px;
       transition: background-color 0.3s ease;
     }
     button:hover {
@@ -77,9 +78,9 @@
 </head>
 <body>
 
-  <h1>Скин игрока Minecraft</h1>
+  <h1>Скин Minecraft</h1>
   <input type="text" id="nickname" placeholder="Введите ник" autocomplete="off" />
-  <button onclick="loadSkin()">Показать скин</button>
+  <button onclick="loadSkin()">🔍</button>
 
   <div class="error" id="error" style="display:none;"></div>
 
@@ -96,7 +97,7 @@
     <p>Тело:</p>
     <div class="skin-container" style="width:200px; height:auto;">
       <img id="body-base" class="layer-base" src="" alt="Тело базовое" />
-      <img id="body-overlay" class="layer-overlay" src="" alt="Тело наложение" />
+      <img id="body-overlay" class="layer-overlay" src="" alt="Тело наложение" style="padding: 20px;"/>
     </div>
   </div>
 
