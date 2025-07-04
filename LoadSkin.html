@@ -7,11 +7,12 @@
     body {
       font-family: Arial, sans-serif;
       text-align: center;
-      margin-top: 50px;
+      margin-top: 40px;
     }
     input {
       padding: 10px;
       font-size: 16px;
+      width: 220px;
     }
     button {
       padding: 10px 20px;
@@ -19,43 +20,65 @@
       margin-left: 10px;
       cursor: pointer;
     }
-    .skins {
-      margin-top: 30px;
-    }
     img {
-      margin: 10px;
+      margin: 15px;
       border-radius: 10px;
       box-shadow: 0 0 10px #ccc;
+    }
+    .error {
+      color: red;
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
 
-  <h1>Получить скин Minecraft</h1>
-  <input type="text" id="nickname" placeholder="Введите ник игрока">
+  <h1>Скин игрока Minecraft</h1>
+  <input type="text" id="nickname" placeholder="Введите ник">
   <button onclick="loadSkin()">Показать скин</button>
 
-  <div class="skins" id="skins" style="display:none;">
-    <h2>Результат:</h2>
-    <div>
-      <p>Голова (аватар):</p>
-      <img id="avatar" src="" alt="Голова">
-    </div>
-    <div>
-      <p>Тело (3D):</p>
-      <img id="body" src="" alt="Тело">
-    </div>
+  <div class="error" id="error" style="display:none;"></div>
+
+  <div id="result" style="display:none;">
+    <h2>Результат</h2>
+    <p><strong>UUID:</strong> <span id="uuid"></span></p>
+    <p>Голова:</p>
+    <img id="head" src="" alt="Голова">
+    <p>Тело:</p>
+    <img id="body" src="" alt="Тело">
   </div>
 
   <script>
-    function loadSkin() {
-      const nick = document.getElementById('nickname').value.trim();
-      if (!nick) return;
+    async function loadSkin() {
+      const nickname = document.getElementById("nickname").value.trim();
+      const errorEl = document.getElementById("error");
+      const resultEl = document.getElementById("result");
 
-      document.getElementById('avatar').src = `https://crafatar.com/avatars/${nick}?size=150`;
-      document.getElementById('body').src = `https://crafatar.com/renders/body/${nick}?scale=6`;
+      errorEl.style.display = "none";
+      resultEl.style.display = "none";
 
-      document.getElementById('skins').style.display = 'block';
+      if (!nickname) {
+        errorEl.textContent = "Введите ник.";
+        errorEl.style.display = "block";
+        return;
+      }
+
+      try {
+        const response = await fetch(`https://corsproxy.io/?http://api.mojang.com/users/profiles/minecraft/${nickname}`);
+        if (!response.ok) throw new Error("Ник не найден");
+
+        const data = await response.json();
+        const uuid = data.id;
+
+        document.getElementById("uuid").textContent = uuid;
+        document.getElementById("head").src = `https://crafatar.com/avatars/${uuid}?size=150`;
+        document.getElementById("body").src = `https://crafatar.com/renders/body/${uuid}?scale=6`;
+
+        resultEl.style.display = "block";
+      } catch (err) {
+        errorEl.textContent = "Ошибка: " + err.message;
+        errorEl.style.display = "block";
+      }
     }
   </script>
 
