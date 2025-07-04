@@ -27,19 +27,13 @@
       border-radius: 10px;
       box-shadow: 0 0 10px #ccc;
     }
-    .error {
-      color: red;
-      margin-top: 20px;
-    }
   </style>
 </head>
 <body>
 
-  <h1>Скин Minecraft по нику</h1>
+  <h1>Получить скин Minecraft</h1>
   <input type="text" id="nickname" placeholder="Введите ник игрока">
   <button onclick="loadSkin()">Показать скин</button>
-
-  <div class="error" id="error" style="display:none;"></div>
 
   <div class="skins" id="skins" style="display:none;">
     <h2>Результат:</h2>
@@ -54,30 +48,14 @@
   </div>
 
   <script>
-    async function loadSkin() {
+    function loadSkin() {
       const nick = document.getElementById('nickname').value.trim();
-      const error = document.getElementById('error');
-      const skins = document.getElementById('skins');
-      error.style.display = 'none';
-      skins.style.display = 'none';
-
       if (!nick) return;
 
-      try {
-        const res = await fetch(`https://api.mojang.com/users/profiles/minecraft/${nick}`);
-        if (!res.ok) throw new Error("Пользователь не найден");
+      document.getElementById('avatar').src = `https://crafatar.com/avatars/${nick}?size=150`;
+      document.getElementById('body').src = `https://crafatar.com/renders/body/${nick}?scale=6`;
 
-        const data = await res.json();
-        const uuid = data.id;
-
-        document.getElementById('avatar').src = `https://crafatar.com/avatars/${uuid}?size=150`;
-        document.getElementById('body').src = `https://crafatar.com/renders/body/${uuid}?scale=6`;
-        skins.style.display = 'block';
-
-      } catch (e) {
-        error.innerText = 'Ошибка: ' + e.message;
-        error.style.display = 'block';
-      }
+      document.getElementById('skins').style.display = 'block';
     }
   </script>
 
